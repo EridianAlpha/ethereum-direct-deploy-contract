@@ -33,13 +33,12 @@ async function main() {
     let gasLimit = "200000"
     let nonce = await provider.getTransactionCount(wallet.address)
     let transactionType = 2
-    // let chainId = process.env.CHAIN_ID
 
     // *******************
     // CREATE TRANSACTION
     // *******************
     let transaction = {
-        // to: , // Leave "to" address empty as that's how contracts are created
+        to: null, // Leave "to" address empty as that's how contracts are created
         gasLimit: gasLimit,
         maxPriorityFeePerGas: ethers.utils.parseUnits(
             maxPriorityFeePerGasGwei,
