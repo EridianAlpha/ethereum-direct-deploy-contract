@@ -1,17 +1,18 @@
-require("dotenv").config()
-
-const ethers = require("ethers")
-const readlineSync = require("readline-sync")
+import { ethers, Wallet } from "ethers"
+import * as readlineSync from "readline-sync"
+import "dotenv/config"
 
 async function main() {
     // **************
     // DEFINE WALLET
     // **************
+    let mnemonic: string = process.env.MNEMONIC || ""
+    let walletDerivative: string = process.env.WALLET_DERIVATIVE || ""
+
     let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
-    let wallet = new ethers.Wallet.fromMnemonic(
-        process.env.MNEMONIC,
-        process.env.WALLET_DERIVATIVE
-    ).connect(provider)
+    let wallet = ethers.Wallet.fromMnemonic(mnemonic, walletDerivative).connect(
+        provider
+    )
 
     console.log("\nMY WALLET ADDRESS")
     console.log(wallet.address)
@@ -38,7 +39,7 @@ async function main() {
     // CREATE TRANSACTION
     // *******************
     let transaction = {
-        to: null, // Leave "to" address empty as that's how contracts are created
+        // to: , // Leave "to" address empty as that's how contracts are created
         gasLimit: gasLimit,
         maxPriorityFeePerGas: ethers.utils.parseUnits(
             maxPriorityFeePerGasGwei,
@@ -47,7 +48,7 @@ async function main() {
         maxFeePerGas: ethers.utils.parseUnits(maxFeePerGasGwei, "gwei"),
         nonce: nonce,
         type: transactionType,
-        chainId: parseInt(process.env.CHAIN_ID),
+        chainId: parseInt(process.env.CHAIN_ID!),
         data: contractBinary,
     }
 
@@ -68,7 +69,7 @@ async function main() {
     let logTimer = 5
 
     while (!txBlockNumber) {
-        tx = await provider.getTransaction(sentTransaction.hash)
+        let tx = await provider.getTransaction(sentTransaction.hash)
 
         if (!tx.blockNumber) {
             if (logTimer >= 5) {
