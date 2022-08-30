@@ -1,0 +1,11 @@
+{
+    "dependencies": {
+        "dotenv": "^16.0.1",
+        "ethers": "^5.7.0",
+        "readline-sync": "^1.4.10",
+        "solc": "0.8.16"
+    },
+    "scripts": {
+        "compile": "yarn solcjs --bin --abi --include-path node_modules --base-path . -o . *.sol"
+    }
+}
