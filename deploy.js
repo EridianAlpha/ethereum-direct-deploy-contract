@@ -7,13 +7,14 @@ async function main() {
     // **************
     // DEFINE WALLET
     // **************
-    let httpProvider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
+    let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
 
     let walletDerivativeCombined = `m/44'/60'/0'/0/0`
     let wallet = new ethers.Wallet.fromMnemonic(
         process.env.MNEMONIC,
         walletDerivativeCombined
     )
+    wallet = wallet.connect(provider)
 
     console.log("\nMY WALLET ADDRESS")
     console.log(wallet.address)
@@ -33,9 +34,9 @@ async function main() {
     // TRANSACTION VARIABLES
     // **********************
     let gasLimit = "200000"
-    let nonce = await httpProvider.getTransactionCount(wallet.address)
+    let nonce = await provider.getTransactionCount(wallet.address)
     let transactionType = 2
-    let chainId = process.env.CHAIN_ID
+    // let chainId = process.env.CHAIN_ID
 
     // *******************
     // CREATE TRANSACTION
@@ -50,34 +51,28 @@ async function main() {
         maxFeePerGas: ethers.utils.parseUnits(maxFeePerGasGwei, "gwei"),
         nonce: nonce,
         type: transactionType,
-        chainId: chainId,
+        chainId: parseInt(process.env.CHAIN_ID),
         data: contractBinary,
     }
-
-    // ***********************************
-    // SIGN AND SERIALIZE THE TRANSACTION
-    // ***********************************
-    let rawTransaction = await wallet
-        .signTransaction(transaction)
-        .then(ethers.utils.serializeTransaction(transaction))
 
     // ************************
     // SEND SIGNED TRANSACTION
     // ************************
-    let sentTransaction = await httpProvider.sendTransaction(rawTransaction)
+    let sentTransaction = await wallet.sendTransaction(transaction)
+
     console.log("\nSENT TRANSACTION HASH")
     console.log(sentTransaction.hash)
 
     console.log("\nTRANSACTION STATUS")
 
-    let currentBlock = await httpProvider.getBlockNumber()
+    let currentBlock = await provider.getBlockNumber()
     console.log("Starting block: " + currentBlock)
 
     let txBlockNumber = null
     let logTimer = 5
 
     while (!txBlockNumber) {
-        tx = await httpProvider.getTransaction(sentTransaction.hash)
+        tx = await provider.getTransaction(sentTransaction.hash)
 
         if (!tx.blockNumber) {
             if (logTimer >= 5) {
@@ -95,3 +90,8 @@ async function main() {
 }
 
 main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error)
+        process.exit(1)
+    })
