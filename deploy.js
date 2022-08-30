@@ -8,13 +8,10 @@ async function main() {
     // DEFINE WALLET
     // **************
     let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
-
-    let walletDerivativeCombined = `m/44'/60'/0'/0/0`
     let wallet = new ethers.Wallet.fromMnemonic(
         process.env.MNEMONIC,
-        walletDerivativeCombined
-    )
-    wallet = wallet.connect(provider)
+        process.env.WALLET_DERIVATIVE
+    ).connect(provider)
 
     console.log("\nMY WALLET ADDRESS")
     console.log(wallet.address)
