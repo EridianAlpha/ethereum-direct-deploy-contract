@@ -9,6 +9,6 @@ contract TestContract {
     uint256 public immutable favoriteNumber;
 
     constructor() {
-        favoriteNumber = 8;
+        favoriteNumber = 7;
     }
 }

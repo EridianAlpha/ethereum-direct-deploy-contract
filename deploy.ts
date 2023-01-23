@@ -6,20 +6,28 @@ async function main() {
     // **************
     // DEFINE WALLET
     // **************
-    let mnemonic: string = process.env.MNEMONIC || ""
-    let walletDerivative: string = process.env.WALLET_DERIVATIVE || ""
+    let privateKey: string = process.env.PRIVATE_KEY || ""
+    let rpcUrl: string = process.env.RPC_URL || ""
+    let rpcUser: string = process.env.RPC_USER || ""
+    let rpcPassword: string = process.env.RPC_PASSWORD || ""
 
-    let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL)
-    let wallet = ethers.Wallet.fromMnemonic(mnemonic, walletDerivative).connect(
-        provider
-    )
+    var urlInfo = {
+        url: rpcUrl,
+        user: rpcUser,
+        password: rpcPassword,
+    }
+    var provider = new ethers.providers.JsonRpcProvider(urlInfo)
+
+    let wallet = new Wallet(privateKey).connect(provider)
 
     console.log("\nMY WALLET ADDRESS")
     console.log(wallet.address)
-    console.log()
+    console.log(
+        "Nonce: " + (await provider.getTransactionCount(wallet.address))
+    )
 
     let maxPriorityFeePerGasGwei = await readlineSync.question(
-        "Enter maxPriorityFeePerGasGwei: "
+        "\nEnter maxPriorityFeePerGasGwei: "
     )
     let maxFeePerGasGwei = await readlineSync.question(
         "Enter maxFeePerGasGwei: "
